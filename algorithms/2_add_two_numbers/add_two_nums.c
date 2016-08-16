@@ -5,55 +5,40 @@
  *     struct ListNode *next;
  * };
  */
+/* Optimize:
+ * 1. use dummyhead for storing return list head,
+ *      condense the complexity of logic
+ * 2. condense judgement for l1,l2 NULL state
+ * 3. unite l1,l2 and carry judgement */
 struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2) {
+    /* a dummyhead */
+    struct ListNode head = {0,NULL};
+    /* a pointer to curr list last entry */
+    struct ListNode *pcur = &head;
+
     /* store new entry for result */
     struct ListNode *entry;
-    struct ListNode *head = NULL;
-    struct ListNode *tail = NULL;
     int v1,v2;
-    int val = 0;
-    while (l1 != NULL || l2 != NULL)
+    int val_with_carry = 0;
+
+    while (l1 || l2 || val_with_carry)
     {
-        if (l1 == NULL)
-            v1 = 0;
-        else
-        {
-            v1 = l1->val;
+        v1 = (l1 == NULL) ? 0 : l1->val;
+        if (l1)
             l1 = l1->next;
-        }
-        if (l2 == NULL)
-            v2 = 0;
-        else
-        {
-            v2 = l2->val;
+        v2 = (l2 == NULL) ? 0 : l2->val;
+        if (l2)
             l2 = l2->next;
-        }
 
-        val += v1 + v2;
+        val_with_carry += v1 + v2;
 
         entry = malloc(sizeof(struct ListNode));
         entry->next = NULL;
-        if (head == NULL)
-            head = entry;
-        if (tail != NULL)
-            tail->next = entry;
-        tail = entry;
+        pcur->next = entry;
+        pcur = pcur->next;
 
-        entry->val = val%10;
-        val = val/10;
+        entry->val = val_with_carry%10;
+        val_with_carry /= 10;
     }
-    if (val)
-    {
-        entry = malloc(sizeof(struct ListNode));
-        entry->next = NULL;
-        if (head == NULL)
-            head = entry;
-        if (tail != NULL)
-            tail->next = entry;
-        tail = entry;
-
-        entry->val = val;
-    }
-
-    return head;
+    return head.next;
 }
